@@ -2,18 +2,19 @@
 
 {% block content %}
 
-    <a href="/blog">Main Blog Page</a>
+    <a href="/blog">Main Blog Page</a> |
     <a href="/newpost">Add a Blog Entry</a>
 
     <center>
-    <h1>Add a Blog Entry</h1>
+    <h1><span class="heading">Add a Blog Entry</span></h1>
     </center>
 
+    <div>
     <form method="POST" action="/newpost">
     <p>
     Title for your new blog:<br />
     {% if title_alert|length > 0 %}
-    {{title_alert}}<br />
+    <span class="alert">{{title_alert}}</span><br />
     {% endif %}
     <input type="text" name="post_title" value="{{title_hold}}" placeholder="Enter the blog post title.">
     </p>
@@ -21,14 +22,15 @@
     <p>
     Your New Blog:<br />
     {% if body_alert|length > 0 %}
-    {{body_alert}}<br />
+    <span class="alert">{{body_alert}}</span><br />
     {% endif %}
-    <textarea name="post_body" rows="10" cols="50">{{body_hold}}</textarea>
+    <textarea name="post_body">{{body_hold}}</textarea>
     </p>
 
     <p>
     <input type="submit" name="submit" value="Create Blog Post"
     </p>
     </form>
+    </div>
 
 {% endblock %}

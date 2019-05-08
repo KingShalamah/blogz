@@ -2,11 +2,11 @@
 
 {% block content %}
 
-    <a href="/blog">Main Blog Page</a>
+    <a href="/blog">Main Blog Page</a> |
     <a href="/newpost">Add a Blog Entry</a>
 
     <center>
-    <h1>Build A Blog</h1>
+    <h1><span class="heading">{{blog.title}}</span></h1>
     </center>
 
     {% if blogs|length == 0 %}
@@ -14,9 +14,9 @@
     <p>No blog posts yet</p>
 
     {% else %}
-
-                <h1>{{blog.title}}</h1>
-                <p>{{blog.body}}</p>
+                <center>
+                <p class="fancy">{{blog.body}}</p>
+                </center>
 
     {% endif %}
 
