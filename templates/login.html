@@ -2,33 +2,33 @@
 
 {% block content %}
 
-    <a href="/blog">Main Blog Page</a> |
-    <a href="/newpost">Add a Blog Entry</a>
+    <a href="/index">Home</a> |
+    <a href="signup">Sign Up</a>
 
     <center>
-    <h1><span class="heading">Add a Blog Entry</span></h1>
+    <h1><span class="heading">Login to MiniPress</span></h1>
     </center>
 
     <div>
-    <form method="POST" action="/newpost">
+    <form method="POST" action="/login">
     <p>
-    Title for your new blog:<br />
-    {% if title_alert|length > 0 %}
-    <span class="alert">{{title_alert}}</span><br />
+    Username:<br />
+    {% if username_alert|length > 0 %}
+    <span class="alert">{{username_alert}}</span><br />
     {% endif %}
-    <input type="text" name="post_title" value="{{title_hold}}" placeholder="Enter the blog post title.">
+    <input type="text" name="username" value="{{username_hold}}" placeholder="Username">
     </p>
 
     <p>
-    Your New Blog:<br />
-    {% if body_alert|length > 0 %}
-    <span class="alert">{{body_alert}}</span><br />
+    Password:<br />
+    {% if password_alert|length > 0 %}
+    <span class="alert">{{password_alert}}</span><br />
     {% endif %}
-    <textarea name="post_body">{{body_hold}}</textarea>
+    <input type="password" name="password" placeholder="Password">
     </p>
 
     <p>
-    <input type="submit" name="submit" value="Create Blog Post"
+    <input type="submit" name="submit" value="Login">
     </p>
     </form>
     </div>
