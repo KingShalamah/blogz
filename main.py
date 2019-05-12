@@ -39,16 +39,30 @@ class User(db.Model):
         self.password = password
         self.email = email
 
+@app.before_request
+def require_login():
+    # These allowed routes are names of view functions, NOT the actual URL route.
+    allowed_routes = ['signup','login','blog','index']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
 
-@app.route('/blog', methods=['GET'])
-def show_blogs():
-    blogs = Blog.query.all()
-    return render_template('blog.html',blogs=blogs)
+
+@app.route('/logout')
+def logout():
+    # Delete the user's login session.
+    del session['username']
+
+    # Redirect the logged out user to the home page.
+    return redirect('/articles')
 
 
-"""
+
 @app.route('/newpost', methods=['POST', 'GET'])
 def create_blog_post():
+    if request.method == 'GET':
+        login_name = session['username']
+        return render_template('create_post.html',login_name=login_name)
+
     if request.method == 'POST':
         check_post_title = request.form['post_title']
         check_post_body = request.form['post_body']
@@ -92,10 +106,6 @@ def create_blog_post():
         post_title = request.form['post_title']
         post_body = request.form['post_body']
         return render_template('create_post.html', title_hold=post_title, body_hold=post_body,  title_alert=post_title_status, body_alert=post_body_status)
-    
-    elif request.method == 'GET':
-        return render_template('create_post.html')
-"""
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -169,50 +179,55 @@ def signup():
         session['username'] = username
         return redirect('/newpost')
 
-"""
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
 
-        # If this username and password exists, go ahead and log the user in.
-        if user and user.password == password:
-            # Create the login session.
-            return "You are logged in!"
+        # If this username exists and the password is correct, go ahead and log the user in.
+        if request.method == 'POST' and user and user.password == password:
+            session['username'] = username
+            return redirect('/newpost')
 
         else:
-            # Do not let the user log in.
-            return "The username or password you entered does not exist."
-    return render_template('login.html')
-"""
+            # If the username does not exist, show the username alert.
+            if request.method == 'POST' and not user:
+                username_status = "The username you entered does not exist."
+                return render_template('login.html', username_alert=username_status)
+
+            # If the username exists, but the password is incorrect, show the password alert.
+            if request.method == 'POST' and user and user.password != password:
+                password_status = "The password you entered is incorrect."
+                return render_template('login.html', username_hold=username, password_alert=password_status)
 
 
-"""
+@app.route('/blog', methods=['POST', 'GET'])
+def blog():
+    blogs = Blog.query.all()
+
+    if 'username' in session:
+        login_name = session['username']
+        return render_template('articles.html',blogs=blogs,login_name=login_name,title='Welcome to MiniPress')
+
+    if 'username' not in session:
+        return render_template('blog.html',blogs=blogs,title='Welcome to MiniPress')
+
+
 @app.route('/index', methods=['POST', 'GET'])
 def index():
-    blog_id = request.args.get('id')
+    if 'username' in session:
+        login_name = session['username']
+        return render_template('home.html',login_name=login_name)
 
-    if request.method == 'GET' and not blog_id:
-        return redirect('/blog')
+    if 'username' not in session:
+        return render_template('index.html')
 
-    if request.method == 'GET' and int(blog_id) > 0:
-        blogs = Blog.query.all()
-        blog = Blog.query.get(blog_id)
-        return render_template('single_blog.html',blogs=blogs,blog=blog)
-"""
-
-
-"""
-@app.route('/logout', methods=['POST'])
-def logout():
-    if request.method == 'POST':
-        # Delete the current username from the session.
-
-        # Redirect the logged out user to the blog page.
-        return redirect('/blog')
-"""
 
 if __name__ == '__main__':
 
