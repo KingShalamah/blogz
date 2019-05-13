@@ -304,7 +304,11 @@ def profile():
         login_user = User.query.filter_by(username=login_name).first()
         login_email = login_user.email
         login_gender = login_user.gender
-        return render_template('status.html',login_gender=login_gender,login_name=login_name,login_email=login_email)
+
+        # Figuring out how to add number of blog posts to profile page
+        login_id = login_user.id
+        post_count = Blog.query.filter_by(owner_id=login_id).count()
+        return render_template('status.html',post_count=post_count,login_gender=login_gender,login_name=login_name,login_email=login_email)
 
 
 @app.route('/', methods=['POST', 'GET'])
