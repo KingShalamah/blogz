@@ -42,7 +42,7 @@ class User(db.Model):
 @app.before_request
 def require_login():
     # These allowed routes are names of view functions, NOT the actual URL route.
-    allowed_routes = ['signup','login','blog','index']
+    allowed_routes = ['signup','login','blog','index','single','author']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -53,7 +53,7 @@ def logout():
     del session['username']
 
     # Redirect the logged out user to the home page.
-    return redirect('/articles')
+    return redirect('/blog')
 
 
 
@@ -110,8 +110,12 @@ def create_blog_post():
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    if request.method == 'GET':
-        return render_template('signup.html')
+    if request.method == 'GET' and 'username' not in session:
+        return render_template('signup.html',login_name=False)
+
+    if request.method == 'GET' and 'username' in session:
+        login_name = session['username']
+        return render_template('status.html',login_name=login_name)
 
     username = request.form['username']
     password = request.form['password']
@@ -182,10 +186,14 @@ def signup():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method == 'GET':
-        return render_template('login.html')
+    if 'username' in session:
+        login_name = session['username']
+        return render_template('status.html', login_name=login_name)
 
-    if request.method == 'POST':
+    if request.method == 'GET' and 'username' not in session:
+        return render_template('login.html', login_name=False)
+
+    if request.method == 'POST' and 'username' not in session:
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
@@ -209,24 +217,89 @@ def login():
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
-    blogs = Blog.query.all()
+    author_name = request.args.get('user')
+    blog_id = request.args.get('id')
 
-    if 'username' in session:
+    if 'username' in session and not author_name:
         login_name = session['username']
+        blogs = Blog.query.all()
         return render_template('articles.html',blogs=blogs,login_name=login_name,title='Welcome to MiniPress')
 
-    if 'username' not in session:
-        return render_template('blog.html',blogs=blogs,title='Welcome to MiniPress')
+    if 'username' in session and author_name:
+        login_name = session['username']
+        user = User.query.filter_by(username=author_name).first()
+        blog_owner = user.id
+        blogs = Blog.query.filter_by(owner_id=blog_owner).all()
+        return render_template('blog.html',blogs=blogs,user=user,login_name=login_name,title='Welcome to MiniPress')
+
+    if 'username' not in session and blog_id:
+        blogs = Blog.query.filter_by(id=blog_id)
+        return render_template('single_blog.html',blogs=blogs,login_name=False,title='Welcome to MiniPress')
+
+    if 'username' not in session and not author_name:
+        blogs = Blog.query.all()
+        return render_template('articles.html',blogs=blogs,login_name=False,title='Welcome to MiniPress')
 
 
 @app.route('/index', methods=['POST', 'GET'])
 def index():
     if 'username' in session:
         login_name = session['username']
-        return render_template('home.html',login_name=login_name)
+        return render_template('home.html',login_name=login_name,title='Welcome to MiniPress')
 
     if 'username' not in session:
-        return render_template('index.html')
+        return render_template('index.html',login_name=False,title='Welcome to MiniPress')
+
+
+@app.route('/author', methods=['POST', 'GET'])
+def author():
+    authors = User.query.all()
+
+    if 'username' in session:
+        login_name = session['username']
+        return render_template('author.html',authors=authors,login_name=login_name,title='Welcome to MiniPress')
+
+    if 'username' not in session:
+        return render_template('author.html',login_name=False,authors=authors,title='Welcome to MiniPress')
+
+
+@app.route('/profile', methods=['POST', 'GET'])
+def profile():
+    if 'username' in session:
+        login_name = session['username']
+        login_user = User.query.filter_by(username=login_name).first()
+        login_email = login_user.email
+        return render_template('status.html', login_name=login_name,login_email=login_email)
+
+
+@app.route('/', methods=['POST', 'GET'])
+def single():
+    blog_id = request.args.get('id')
+    author_name = request.args.get('user')
+
+    if 'username' in session and request.method == 'GET' and not blog_id:
+        return redirect('/blog')
+
+    if 'username' in session and request.method == 'GET' and int(blog_id) > 0:
+        login_name = session['username']
+        # blogs = Blog.query.all()
+        blog = Blog.query.get(blog_id)
+
+        user = User.query.filter_by(username=author_name).first()
+        blog_owner = user.id
+        blogs = Blog.query.filter_by(owner_id=blog_owner).all()
+        return render_template('single.html',user=user,blogs=blogs,blog=blog,login_name=login_name)
+
+
+    if 'username' not in session and request.method == 'GET' and not blog_id:
+        return redirect('/blog')
+
+    if 'username' not in session and request.method == 'GET' and int(blog_id) > 0:
+        blogs = Blog.query.all()
+        blog = Blog.query.get(blog_id)
+        owner = blog.owner
+        owner = owner.username
+        return render_template('single_blog.html',owner=owner,login_name=False,blogs=blogs,blog=blog)
 
 
 if __name__ == '__main__':
