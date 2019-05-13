@@ -15,7 +15,21 @@
         
             {% for author in authors %}
                 <div>
+
+                {% if author.gender == 'Male' %}
+                <img src="{{url_for('static', filename='avatar.png')}}" height="3%" width="5%" />
+                {% endif %}
+
+                {% if author.gender == 'Female' %}
+                <img src="{{url_for('static', filename='avatar-female.png')}}" height="5%" width="5%" />
+                {% endif %}
+
+                {% if author.gender == 'Other' %}
+                <img src="{{url_for('static', filename='avatar-other.png')}}" height="9%" width="8%" />
+                {% endif %}
+
                 <a href="blog?user={{author.username}}">{{author.username}}</a>
+
                 </div>
             
             {% endfor %}
