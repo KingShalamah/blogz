@@ -2,12 +2,9 @@
 
 {% block content %}
 
-    <a href="/index">Home</a> |
-    <a href="/login">Login</a> |
-    <a href="/signup">Sign Up</a>
 
     <center>
-    <h1><span class="heading">MiniPress</span></h1>
+    <h1><span class="heading">MiniPress Blogs</span></h1>
     </center>
 
     {% if blogs|length == 0 %}
@@ -16,13 +13,17 @@
 
     {% else %}
 
-        
+
             {% for blog in blogs %}
-            
-                <a href="/?id={{blog.id}}">{{blog.title}}</a>
-                <hr>
-            
+            <center>
+            <a href="/blog?id={{blog.id}}&user={{user.username}}">{{blog.title}}</a>
+            </center>
             {% endfor %}
+        
+            <center>
+            Written by <a href="/blog?user={{user.username}}">{{user.username}}</a>
+            </center>
+            
 
         
 

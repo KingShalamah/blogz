@@ -84,6 +84,20 @@
     </head>
 <body>
 
+    {% if login_name != False %}
+    <a href="/">Home</a> |
+    <a href="/newpost">New Post</a> |
+    <a href="/profile">Logged in as: {{login_name}}</a> |
+    <a href="/logout">Logout</a>
+    {% endif %}
+
+    {% if login_name == False %}
+    <a href="/">Home</a> |
+    <a href="/blog">All Posts</a> |
+    <a href="/login">Login</a> |
+    <a href="/signup">Sign Up</a>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 

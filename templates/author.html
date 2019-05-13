@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <center>
+    <h1><span class="heading">MiniPress Users</span></h1>
+    </center>
+
+    {% if authors|length == 0 %}
+
+    <p>No authors posts yet</p>
+
+    {% else %}
+
+        
+            {% for author in authors %}
+            
+                <a href="blog?user={{author.username}}">{{author.username}}</a>
+                <hr>
+            
+            {% endfor %}
+
+        
+
+    {% endif %}
+
+{% endblock %}
