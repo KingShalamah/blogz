@@ -14,6 +14,7 @@
     <h2>You are currently logged in as: {{login_name}}</h2>
     <h2>Your account email is: {{login_email}}</h2>
     <h2>Your gender is: {{login_gender}}</h2>
+    <h2>Your blog post count is: {{post_count}}</h2>
     </div>
     {% endif %}
     
@@ -25,6 +26,19 @@
     <h2>You are currently logged in as: {{login_name}}</h2>
     <h2>Your account email is: {{login_email}}</h2>
     <h2>Your gender is: {{login_gender}}</h2>
+    <h2>Your blog post count is: {{post_count}}</h2>
+    </div>
+    {% endif %}
+
+
+    {% if login_gender == 'Other' %}
+    <div>
+    <center><img src="{{url_for('static', filename='avatar-other.png')}}" height="25%" width="25%" />
+    </center>
+    <h2>You are currently logged in as: {{login_name}}</h2>
+    <h2>Your account email is: {{login_email}}</h2>
+    <h2>Your gender is: {{login_gender}}</h2>
+    <h2>Your blog post count is: {{post_count}}</h2>
     </div>
     {% endif %}
 
