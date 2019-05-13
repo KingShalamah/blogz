@@ -296,8 +296,11 @@ def single():
     blog_id = request.args.get('id')
     author_name = request.args.get('user')
 
-    if 'username' in session and request.method == 'GET' and not blog_id:
-        return redirect('/blog')
+    if 'username' in session and request.method == 'GET' and not blog_id and not author_name:
+        login_name = session['username']
+        authors = User.query.all()
+        return render_template('author.html',login_name=login_name,authors=authors)
+
 
     if 'username' in session and request.method == 'GET' and int(blog_id) > 0:
         login_name = session['username']
