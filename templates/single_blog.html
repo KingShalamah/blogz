@@ -2,15 +2,10 @@
 
 {% block content %}
 
-    <center>
-    <h1><span class="heading">{{blog.title}}</span></h1>
-    </center>
+                <center>
+                <h1><span class="heading">{{blog.title}}</span></h1>
+                </center>
 
-    {% if blogs|length == 0 %}
-
-    <p>No blog posts yet</p>
-
-    {% else %}
                 <center>
                 <p class="fancy">{{blog.body}}</p>
                 </center>
@@ -19,6 +14,5 @@
                 <p class="fancy">Written by <a href="/blog?user={{owner}}">{{owner}}</a></p>
                 </center>
 
-    {% endif %}
 
 {% endblock %}

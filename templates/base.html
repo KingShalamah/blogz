@@ -77,6 +77,10 @@
                font-size: 20px;
            }
 
+           a.right {
+             float: right;
+           }
+
            p.fancy {
              font-size: 20px;
            }
@@ -94,8 +98,11 @@
     {% if login_name == False %}
     <a href="/">Home</a> |
     <a href="/blog">All Posts</a> |
-    <a href="/login">Login</a> |
-    <a href="/signup">Sign Up</a>
+    <a href="/newpost">New Post</a> 
+
+    <a class="right" href="/login">Login &nbsp;&nbsp;&nbsp;&nbsp; </a> 
+    
+    <a class="right" href="/signup">Sign Up &nbsp;&nbsp;&nbsp;&nbsp; </a>
     {% endif %}
 
     {% block content %}

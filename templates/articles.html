@@ -16,8 +16,10 @@
         
             {% for blog in blogs %}
             
-                <a href="/?id={{blog.id}}">{{blog.title}}</a>
-                <hr>
+                <div>
+                <a href="/blog?id={{blog.id}}">{{blog.title}}</a><br />
+                Written by <a href="/blog?user={{blog.owner.username}}">{{blog.owner.username}}</a>
+                </div>
             
             {% endfor %}
 

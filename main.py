@@ -98,7 +98,7 @@ def create_blog_post():
 
         # Redirect the user to their newly created blog post.
         value = new_post.id
-        location = '/?id={}'
+        location = '/blog?id={}'
         location = location.format(value)
         return redirect(location)
 
@@ -220,25 +220,44 @@ def blog():
     author_name = request.args.get('user')
     blog_id = request.args.get('id')
 
-    if 'username' in session and not author_name:
+    if 'username' in session and not author_name and not blog_id:
         login_name = session['username']
         blogs = Blog.query.all()
         return render_template('articles.html',blogs=blogs,login_name=login_name,title='Welcome to MiniPress')
 
-    if 'username' in session and author_name:
+    if 'username' in session and blog_id and not author_name:
+        # Working Properly
+        login_name = session['username']
+        blog = Blog.query.get(blog_id)
+        return render_template('blog_single.html',blog=blog,login_name=login_name,title='Welcome to MiniPress')
+
+
+    if 'username' in session and author_name and not blog_id:
         login_name = session['username']
         user = User.query.filter_by(username=author_name).first()
-        blog_owner = user.id
-        blogs = Blog.query.filter_by(owner_id=blog_owner).all()
-        return render_template('blog.html',blogs=blogs,user=user,login_name=login_name,title='Welcome to MiniPress')
+        blogs = Blog.query.filter_by(owner_id=user.id).all()
+        return render_template('singleUser.html',user=user,blogs=blogs,login_name=login_name,title='Welcome to MiniPress')
 
-    if 'username' not in session and blog_id:
-        blogs = Blog.query.filter_by(id=blog_id)
-        return render_template('single_blog.html',blogs=blogs,login_name=False,title='Welcome to MiniPress')
 
-    if 'username' not in session and not author_name:
+    if 'username' not in session and blog_id and not author_name:
+        # Working properly
+        blog = Blog.query.get(blog_id)
+        owner = blog.owner
+        owner = owner.username
+        return render_template('single_blog.html',owner=owner,blog=blog,login_name=False,title='Welcome to MiniPress')
+
+
+    if 'username' not in session and author_name and not blog_id:
+        # Working properly
+        user = User.query.filter_by(username=author_name).first()
+        blogs = Blog.query.filter_by(owner_id=user.id).all()
+        return render_template('singleUser.html',user=user,blogs=blogs,login_name=False,title='Welcome to MiniPress')
+
+
+    if 'username' not in session and not author_name and not blog_id:
         blogs = Blog.query.all()
-        return render_template('articles.html',blogs=blogs,login_name=False,title='Welcome to MiniPress')
+        return render_template('blog.html',login_name=False,blogs=blogs)
+
 
 
 @app.route('/index', methods=['POST', 'GET'])
@@ -291,10 +310,12 @@ def single():
         return render_template('single.html',user=user,blogs=blogs,blog=blog,login_name=login_name)
 
 
-    if 'username' not in session and request.method == 'GET' and not blog_id:
-        return redirect('/blog')
+    if 'username' not in session and request.method == 'GET' and not blog_id and not author_name:
+        authors = User.query.all()
+        return render_template('author.html',login_name=False,authors=authors)
 
     if 'username' not in session and request.method == 'GET' and int(blog_id) > 0:
+        # Awesome! I can finally use the owner_id class object!
         blogs = Blog.query.all()
         blog = Blog.query.get(blog_id)
         owner = blog.owner

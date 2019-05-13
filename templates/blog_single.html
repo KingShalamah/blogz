@@ -7,21 +7,12 @@
     <h1><span class="heading">MiniPress Blogs</span></h1>
     </center>
 
-    {% if blogs|length == 0 %}
 
-    <p>No blog posts yet</p>
-
-    {% else %}
-
-
-            {% for blog in blogs %}
             <div>
             <a href="/blog?id={{blog.id}}">{{blog.title}}</a><br />
+            <p>{{blog.body}}</p>
             Written by <a href="/blog?user={{blog.owner.username}}">{{blog.owner.username}}</a>
             </div>
-            {% endfor %}
 
-
-    {% endif %}
 
 {% endblock %}
