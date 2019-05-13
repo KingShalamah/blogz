@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy
+from hashutils import make_pw_hash, check_pw_hash
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -25,8 +26,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16))
 
-    # I will hash the user's password for security purposes.
-    password = db.Column(db.String(20))
+    # Hash the user's password for security purposes.
+    pw_hash = db.Column(db.String(120))
 
     # Optional email for account recovery and security.
     email = db.Column(db.String(50))
@@ -36,7 +37,7 @@ class User(db.Model):
 
     def __init__(self, username, password, email):
         self.username = username
-        self.password = password
+        self.pw_hash = make_pw_hash(password)
         self.email = email
 
 @app.before_request
@@ -198,8 +199,8 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
 
-        # If this username exists and the password is correct, go ahead and log the user in.
-        if request.method == 'POST' and user and user.password == password:
+        # If this username exists and the hashed password is correct, go ahead and log the user in.
+        if request.method == 'POST' and user and check_pw_hash(password, user.pw_hash):
             session['username'] = username
             return redirect('/newpost')
 
