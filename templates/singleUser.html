@@ -4,12 +4,42 @@
     
         <div>
         {% if blogs|length == 0 %}
+
+        <center>
+            {% if user.gender == 'Male' %}
+            <img src="{{url_for('static', filename='avatar.png')}}" height="15%" width="15%" />
+            {% endif %}
+
+            {% if user.gender == 'Female' %}
+            <img src="{{url_for('static', filename='avatar-female.png')}}" height="15%" width="15%" />
+            {% endif %}
+
+            {% if user.gender == 'Other' %}
+            <img src="{{url_for('static', filename='avatar-other.png')}}" height="25%" width="25%" />
+            {% endif %}
     
-        <p>No blog posts yet</p>
+            <p><a href="/blog?user={{user.username}}">{{user.username}}</a> has not written any blog posts yet.</p>
+        </center>
     
         {% else %}
 
         <center>
+            {% if user.gender == 'Male' %}
+            <img src="{{url_for('static', filename='avatar.png')}}" height="15%" width="15%" />
+            {% endif %}
+
+            {% if user.gender == 'Female' %}
+            <img src="{{url_for('static', filename='avatar-female.png')}}" height="15%" width="15%" />
+            {% endif %}
+
+            {% if user.gender == 'Other' %}
+            <img src="{{url_for('static', filename='avatar-other.png')}}" height="25%" width="25%" />
+            {% endif %}
+
+            <br />
+            <h3>Number of Blog Posts: {{post_count}}</h3>
+            
+
             {% for blog in blogs %}
 
             <a href="/blog?id={{blog.id}}">{{blog.title}}</a><br />
@@ -19,10 +49,11 @@
 
         {% endif %}
 
-
-        <center>
-        Written by <a href="/blog?user={{user.username}}">{{user.username}}</a>
-        </center>
+            {% if blogs|length != 0 %}
+                <center>
+                Written by <a href="/blog?user={{user.username}}">{{user.username}}</a>
+                </center>
+            {% endif %}
         </div>
 
 

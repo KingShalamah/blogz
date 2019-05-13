@@ -266,7 +266,8 @@ def blog():
         # Working properly
         user = User.query.filter_by(username=author_name).first()
         blogs = Blog.query.filter_by(owner_id=user.id).all()
-        return render_template('singleUser.html',user=user,blogs=blogs,login_name=False,title='Welcome to MiniPress')
+        post_count = Blog.query.filter_by(owner_id=user.id).count()
+        return render_template('singleUser.html',post_count=post_count,user=user,blogs=blogs,login_name=False,title='Welcome to MiniPress')
 
 
     if 'username' not in session and not author_name and not blog_id:
