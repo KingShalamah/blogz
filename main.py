@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session
+from flask import Flask, request, redirect, render_template, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from hashutils import make_pw_hash, check_pw_hash
 
@@ -32,13 +32,17 @@ class User(db.Model):
     # Optional email for account recovery and security.
     email = db.Column(db.String(50))
 
+    # The gender for the user.
+    gender = db.Column(db.String(6))
+
     # Bind the user to the blogs they write.
     blogs = db.relationship('Blog', backref='owner')
 
-    def __init__(self, username, password, email):
+    def __init__(self, username, password, email, gender):
         self.username = username
         self.pw_hash = make_pw_hash(password)
         self.email = email
+        self.gender = gender
 
 @app.before_request
 def require_login():
@@ -125,10 +129,14 @@ def signup():
     # Optional email for extra account security and recovery.
     email = request.form['email']
 
+    # Optional gender for user preferences and profile pic.
+    gender = request.form['gender']
+
     username_status = ""
     password_status = ""
     verified_status = ""
     email_status = ""
+    gender_status = ""
     activate = True
     email_activate = True
 
@@ -168,16 +176,22 @@ def signup():
     if existing_email and len(email) > 1:
         email_status = "That email is already in use. Please choose another."
         activate = False
+
+    
+    if gender != 'Male' and gender != 'Female' and gender != 'Other':
+        gender_status = "Gender must be Male, Female, or Other. "
+        activate = False
+    
     
     if activate == False:
         message = "Your registration could not be processed.<br />" + username_status + "<br />" + password_status + "<br />" + verified_status
-        return render_template('signup.html', username_alert=username_status,password_alert=password_status,verifypw_alert=verified_status,email_alert=email_status,username=username,email=email)
+        return render_template('signup.html',login_name=False, gender_alert=gender_status, username_alert=username_status,password_alert=password_status,verifypw_alert=verified_status,email_alert=email_status,username=username,email=email)
 
     if activate != False and email_activate == False:
         return render_template('signup.html', username=username, email_status=email_status)
 
     if activate != False and email_activate != False:
-        new_user = User(username, password, email)
+        new_user = User(username, password, email, gender)
         db.session.add(new_user)
         db.session.commit()
 
@@ -224,7 +238,7 @@ def blog():
     if 'username' in session and not author_name and not blog_id:
         login_name = session['username']
         blogs = Blog.query.all()
-        return render_template('articles.html',blogs=blogs,login_name=login_name,title='Welcome to MiniPress')
+        return render_template('articles.html',blogs=blogs,login_name=login_name,title='MiniPress Blogs')
 
     if 'username' in session and blog_id and not author_name:
         # Working Properly
@@ -257,7 +271,7 @@ def blog():
 
     if 'username' not in session and not author_name and not blog_id:
         blogs = Blog.query.all()
-        return render_template('blog.html',login_name=False,blogs=blogs)
+        return render_template('blog.html',login_name=False,blogs=blogs,title='MiniPress Blogs')
 
 
 
@@ -289,7 +303,8 @@ def profile():
         login_name = session['username']
         login_user = User.query.filter_by(username=login_name).first()
         login_email = login_user.email
-        return render_template('status.html', login_name=login_name,login_email=login_email)
+        login_gender = login_user.gender
+        return render_template('status.html',login_gender=login_gender,login_name=login_name,login_email=login_email)
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -300,7 +315,7 @@ def single():
     if 'username' in session and request.method == 'GET' and not blog_id and not author_name:
         login_name = session['username']
         authors = User.query.all()
-        return render_template('author.html',login_name=login_name,authors=authors)
+        return render_template('author.html',login_name=login_name,authors=authors,title='MiniPress Users')
 
 
     if 'username' in session and request.method == 'GET' and int(blog_id) > 0:
@@ -316,7 +331,7 @@ def single():
 
     if 'username' not in session and request.method == 'GET' and not blog_id and not author_name:
         authors = User.query.all()
-        return render_template('author.html',login_name=False,authors=authors)
+        return render_template('author.html',login_name=False,authors=authors,title='MiniPress Users')
 
     if 'username' not in session and request.method == 'GET' and int(blog_id) > 0:
         # Awesome! I can finally use the owner_id class object!
