@@ -7,9 +7,25 @@
     <h1><span class="heading">MiniPress Profile</span></h1>
     </center>
 
+    {% if login_gender == 'Male' %}
     <div>
+    <center><img src="{{url_for('static', filename='avatar.png')}}" height="15%" width="15%" />
+    </center>
     <h2>You are currently logged in as: {{login_name}}</h2>
     <h2>Your account email is: {{login_email}}</h2>
+    <h2>Your gender is: {{login_gender}}</h2>
     </div>
+    {% endif %}
+    
+
+    {% if login_gender == 'Female' %}
+    <div>
+    <center><img src="{{url_for('static', filename='avatar-female.png')}}" height="15%" width="15%" />
+    </center>
+    <h2>You are currently logged in as: {{login_name}}</h2>
+    <h2>Your account email is: {{login_email}}</h2>
+    <h2>Your gender is: {{login_gender}}</h2>
+    </div>
+    {% endif %}
 
 {% endblock %}

@@ -42,6 +42,18 @@
     </p>
 
     <p>
+    Gender:<br />
+    {% if gender_alert|length > 0 %}
+    <span class="alert">{{gender_alert}}</span><br />
+    {% endif %}
+    <select name="gender">
+        <option name="gender" value="Male">Male</option>
+        <option name="gender" value="Female">Female</option>
+        <option name="gender" value="Other">Other</option>
+    </select>
+    </p>
+
+    <p>
     <input type="submit" name="submit" value="Sign Up"
     </p>
     </form>
